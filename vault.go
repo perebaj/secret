@@ -28,40 +28,12 @@ func NewVault(encodingKey, path string) *Vault {
 
 func NewFileVault(encodingKey, path string) (*Vault, error) {
 	v := NewVault(encodingKey, path)
-	err := v.Load(path)
+	err := v.load(path)
 	return v, err
 }
 
-// Load reads a file and decodes the JSON-encoded key-value pairs into the
-// Vault's keyValues map. If the file does not exist, the keyValues map is
-// initialized as an empty map.
-func (v *Vault) Load(path string) error {
-	f, err := os.Open(path)
-	if err != nil {
-		return fmt.Errorf("error opening file: %s", err.Error())
-	}
-	defer f.Close()
-
-	byteValue, err := io.ReadAll(f)
-	if err != nil {
-		return fmt.Errorf("error reading file: %s", err.Error())
-	}
-
-	if len(byteValue) == 0 {
-		// empty file
-		v.keyValues = make(map[string]string)
-		return nil
-	}
-
-	err = json.Unmarshal(byteValue, &v.keyValues)
-	if err != nil {
-		return fmt.Errorf("error decoding vault: %s", err.Error())
-	}
-	return nil
-}
-
 func (v *Vault) Get(key string) (string, error) {
-	err := v.Load(v.path)
+	err := v.load(v.path)
 	if err != nil {
 		return "", fmt.Errorf("error loading vault: %s", err.Error())
 	}
@@ -84,12 +56,16 @@ func (v Vault) Set(key, value string) error {
 	if err != nil {
 		return fmt.Errorf("error encrypting value: %s", err.Error())
 	}
+
+	err = v.load(v.path)
+	if err != nil {
+		return fmt.Errorf("error loading vault: %s", err.Error())
+	}
 	v.keyValues[key] = encryptedValue
-	v.Write(v.path)
-	return nil
+	return v.write(v.path)
 }
 
-func (v *Vault) Write(path string) error {
+func (v *Vault) write(path string) error {
 	f, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
 	if err != nil {
 		return fmt.Errorf("error opening file: %s", err.Error())
@@ -103,6 +79,34 @@ func (v *Vault) Write(path string) error {
 	_, err = f.Write(byteValue)
 	if err != nil {
 		return fmt.Errorf("error writing vault: %s", err.Error())
+	}
+	return nil
+}
+
+// load reads a file and decodes the JSON-encoded key-value pairs into the
+// Vault's keyValues map. If the file does not exist, the keyValues map is
+// initialized as an empty map.
+func (v *Vault) load(path string) error {
+	f, err := os.OpenFile(path, os.O_RDWR|os.O_CREATE, 0600)
+	if err != nil {
+		return fmt.Errorf("error opening file: %s", err.Error())
+	}
+	defer f.Close()
+
+	byteValue, err := io.ReadAll(f)
+	if err != nil {
+		return fmt.Errorf("error reading file: %s", err.Error())
+	}
+
+	if len(byteValue) == 0 {
+		// empty file
+		v.keyValues = make(map[string]string)
+		return nil
+	}
+
+	err = json.Unmarshal(byteValue, &v.keyValues)
+	if err != nil {
+		return fmt.Errorf("error decoding vault: %s", err.Error())
 	}
 	return nil
 }

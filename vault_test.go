@@ -70,7 +70,7 @@ func TestWrite(t *testing.T) {
 	want.keyValues["key1"] = "value1"
 	want.keyValues["key2"] = "value2"
 
-	err = want.Write(f.Name())
+	err = want.write(f.Name())
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -89,5 +89,37 @@ func TestWrite(t *testing.T) {
 	eq := reflect.DeepEqual(want.keyValues, got)
 	if !eq {
 		t.Errorf("got %v, want %v", got, want.keyValues)
+	}
+}
+
+func TestSetGet(t *testing.T) {
+	f, err := os.CreateTemp("", "vault")
+	if err != nil {
+		t.Fatal(err)
+	}
+	v, err := NewFileVault("my-fake-key", f.Name())
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	want := make(map[string]string)
+
+	eq := reflect.DeepEqual(want, v.keyValues)
+	if !eq {
+		t.Errorf("got %v, want %v", v.keyValues, want)
+	}
+
+	err = v.Set("key1", "value1")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	s, err := v.Get("key1")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if s != "value1" {
+		t.Errorf("got %s, want %s", s, "value1")
 	}
 }
