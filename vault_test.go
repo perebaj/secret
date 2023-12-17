@@ -8,7 +8,7 @@ import (
 	"testing"
 )
 
-func TestLoad(t *testing.T) {
+func TestVault_Load(t *testing.T) {
 	f, err := os.CreateTemp("", "vault")
 	if err != nil {
 		t.Fatal(err)
@@ -35,7 +35,7 @@ func TestLoad(t *testing.T) {
 	}
 }
 
-func TestLoad_Empty(t *testing.T) {
+func TestVault_Load_Empty(t *testing.T) {
 	f, err := os.CreateTemp("", "vault")
 	if err != nil {
 		t.Fatal(err)
@@ -55,7 +55,7 @@ func TestLoad_Empty(t *testing.T) {
 	}
 }
 
-func TestWrite(t *testing.T) {
+func TestVault_Write(t *testing.T) {
 	f, err := os.CreateTemp("", "vault")
 	if err != nil {
 		t.Fatal(err)
@@ -92,7 +92,7 @@ func TestWrite(t *testing.T) {
 	}
 }
 
-func TestSetGet(t *testing.T) {
+func TestVault_SetGet(t *testing.T) {
 	f, err := os.CreateTemp("", "vault")
 	if err != nil {
 		t.Fatal(err)
