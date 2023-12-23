@@ -66,7 +66,7 @@ func (v Vault) Set(key, value string) error {
 }
 
 func (v *Vault) write(path string) error {
-	f, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
+	f, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0777)
 	if err != nil {
 		return fmt.Errorf("error opening file: %s", err.Error())
 	}
@@ -87,7 +87,7 @@ func (v *Vault) write(path string) error {
 // Vault's keyValues map. If the file does not exist, the keyValues map is
 // initialized as an empty map.
 func (v *Vault) load(path string) error {
-	f, err := os.OpenFile(path, os.O_RDWR|os.O_CREATE, 0600)
+	f, err := os.OpenFile(path, os.O_RDWR|os.O_CREATE, 0777)
 	if err != nil {
 		return fmt.Errorf("error opening file: %s", err.Error())
 	}
