@@ -8,13 +8,6 @@ import (
 	"github.com/perebaj/secret"
 )
 
-/*
-Usage
-secret set -encodingKey=mykey -path=./.vault -key=foo -value=bar
-secret get -encodingKey=mykey -path=./.vault -key=foo
-
-*/
-
 func main() {
 	help := flag.Bool("h", false, "show help")
 	flag.Parse()
